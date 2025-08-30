@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="background-color" content="#ffffff" />
+    
+    <!-- Mobile Optimizations -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Focus Enterprise" />
+    
+    <!-- App Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="https://mocha-cdn.com/0198fc97-0159-744e-b833-a45107cf8a64/app-icon-192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="https://mocha-cdn.com/0198fc97-0159-744e-b833-a45107cf8a64/app-icon-192.png" />
+    <link rel="shortcut icon" href="https://mocha-cdn.com/0198fc97-0159-744e-b833-a45107cf8a64/app-icon-192.png" type="image/png" />
+    
+    <!-- SEO and Social -->
+    <meta property="og:title" content="Focus Enterprise" />
+    <meta property="og:description" content="Complete business management solution for invoicing, inventory, and financial reporting" />
+    <meta property="og:image" content="https://mocha-cdn.com/0198fc97-0159-744e-b833-a45107cf8a64/app-icon-192.png" type="image/png" />
+    <meta property="og:url" content="https://6nm24dggdutwa.mocha.app" />
+    <meta property="og:type" content="website" />
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Focus Enterprise" />
+    <meta property="twitter:description" content="Complete business management solution for invoicing, inventory, and financial reporting" />
+    <meta property="twitter:image" content="https://mocha-cdn.com/0198fc97-0159-744e-b833-a45107cf8a64/app-icon-192.png" type="image/png" />
+    
+    <!-- Splash Screen for iOS -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-startup-image" href="https://mocha-cdn.com/0198fc97-0159-744e-b833-a45107cf8a64/app-icon-192.png" />
+    
+    <title>Focus Enterprise</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/react-app/main.tsx"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+              
+              // Check for updates
+              registration.addEventListener('updatefound', function() {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', function() {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // New content is available
+                    if (confirm('New version available! Click OK to refresh and get the latest features.')) {
+                      window.location.reload();
+                    }
+                  }
+                });
+              });
+            })
+            .catch(function(err) {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+
+      // PWA Install prompt
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Show install button after a delay
+        setTimeout(() => {
+          if (deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+            const installBanner = document.createElement('div');
+            installBanner.innerHTML = `
+              <div style="position: fixed; bottom: 20px; left: 20px; right: 20px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 1000; font-family: system-ui;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                  <div style="flex: 1;">
+                    <div style="font-weight: 600; margin-bottom: 4px;">Install Focus Enterprise</div>
+                    <div style="font-size: 14px; opacity: 0.9;">Add to your home screen for quick access</div>
+                  </div>
+                  <div style="display: flex; gap: 8px;">
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 6px; font-size: 14px; cursor: pointer;">Later</button>
+                    <button onclick="installPWA()" style="background: white; border: none; color: #3b82f6; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer;">Install</button>
+                  </div>
+                </div>
+              </div>
+            `;
+            document.body.appendChild(installBanner);
+          }
+        }, 3000);
+      });
+
+      function installPWA() {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('User accepted the A2HS prompt');
+            }
+            deferredPrompt = null;
+            // Remove install banner
+            const banner = document.querySelector('[style*="position: fixed"]');
+            if (banner) banner.remove();
+          });
+        }
+      }
+
+      // Handle app install
+      window.addEventListener('appinstalled', (evt) => {
+        console.log('Focus Enterprise was installed successfully');
+      });
+    </script>
+  </body>
+</html>
