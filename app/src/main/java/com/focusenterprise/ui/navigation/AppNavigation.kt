@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -59,18 +60,13 @@ fun AppNavigation() {
         }
     ) { innerPadding ->
         NavHost(navController, startDestination = Screen.Invoices.route, Modifier.padding(innerPadding)) {
+            composable(Screen.Stock.route) {
+                val stockViewModel: StockViewModel = viewModel(factory = viewModelFactory)
+                StockScreen(stockViewModel)
+            }
             composable(Screen.Customers.route) {
                 val customerViewModel: CustomerViewModel = viewModel(factory = viewModelFactory)
                 CustomerScreen(customerViewModel, navController)
-            }
-            composable("customer_detail/{customerId}") { backStackEntry ->
-                val customerId = backStackEntry.arguments?.getString("customerId")?.toIntOrNull()
-                if (customerId != null) {
-                    val detailViewModel: CustomerDetailViewModel = viewModel(
-                        factory = CustomerDetailViewModelFactory(customerId, application)
-                    )
-                    CustomerDetailScreen(viewModel = detailViewModel)
-                }
             }
             composable(Screen.Invoices.route) {
                 val invoiceViewModel: InvoiceViewModel = viewModel(factory = viewModelFactory)
@@ -78,20 +74,25 @@ fun AppNavigation() {
                 val paymentViewModel: PaymentViewModel = viewModel(factory = viewModelFactory)
                 InvoiceScreen(invoiceViewModel, customerViewModel, paymentViewModel, navController)
             }
-            composable("create_invoice") {
-                CreateInvoiceScreen(navController)
-            }
-            composable(Screen.Stock.route) {
-                val stockViewModel: StockViewModel = viewModel(factory = viewModelFactory)
-                StockScreen(stockViewModel)
-            }
             composable(Screen.Expenses.route) {
                 val expenseViewModel: ExpenseViewModel = viewModel(factory = viewModelFactory)
                 ExpenseScreen(expenseViewModel)
             }
             composable(Screen.Reports.route) {
                 val reportViewModel: ReportViewModel = viewModel(factory = viewModelFactory)
-                ReportScreen() // Placeholder
+                ReportScreen(reportViewModel)
+            }
+            composable("create_invoice") {
+                CreateInvoiceScreen(navController)
+            }
+            composable("customer_detail/{customerId}") { backStackEntry ->
+                val customerId = backStackEntry.arguments?.getString("customerId")?.toIntOrNull()
+                if (customerId != null) {
+                    val detailViewModel: CustomerDetailViewModel = viewModel(
+                        factory = CustomerDetailViewModelFactory(customerId, application)
+                    )
+                    CustomerDetailScreen(detailViewModel)
+                }
             }
         }
     }

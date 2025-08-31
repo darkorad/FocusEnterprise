@@ -75,7 +75,7 @@ fun InvoiceListItem(invoice: Invoice, customerName: String, onAddPaymentClick: (
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = "Invoice #${invoice.invoiceId}", style = MaterialTheme.typography.titleMedium)
                     Text(text = "To: $customerName", style = MaterialTheme.typography.bodyMedium)
-                    Text(text = formatDate(invoice.date), style = MaterialTheme.typography.bodySmall)
+                    Text(text = formatDate(invoice.date, "dd MMM yyyy"), style = MaterialTheme.typography.bodySmall)
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(text = "RSD ${"%.2f".format(invoice.totalAmount)}", style = MaterialTheme.typography.bodyLarge)
@@ -125,7 +125,7 @@ fun AddPaymentDialog(invoice: Invoice, onDismiss: () -> Unit, onSave: (Double) -
     )
 }
 
-private fun formatDate(timestamp: Long): String {
-    val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+private fun formatDate(timestamp: Long, format: String): String {
+    val sdf = SimpleDateFormat(format, Locale.getDefault())
     return sdf.format(Date(timestamp))
 }

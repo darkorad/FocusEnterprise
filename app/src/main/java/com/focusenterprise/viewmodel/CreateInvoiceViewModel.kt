@@ -1,9 +1,7 @@
 package com.focusenterprise.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.focusenterprise.FocusEnterpriseApplication
 import com.focusenterprise.data.Customer
 import com.focusenterprise.data.Invoice
 import com.focusenterprise.data.InvoiceItem
