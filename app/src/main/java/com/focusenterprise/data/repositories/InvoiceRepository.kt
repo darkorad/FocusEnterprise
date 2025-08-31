@@ -43,7 +43,6 @@ class InvoiceRepository(
     }
 
     suspend fun addPaymentToInvoice(invoice: Invoice, amount: Double) {
-        // 1. Add payment
         val payment = Payment(
             invoiceId = invoice.invoiceId,
             amount = amount,
@@ -51,7 +50,6 @@ class InvoiceRepository(
         )
         paymentDao.insert(payment)
 
-        // 2. Update invoice
         val newPaidAmount = invoice.paidAmount + amount
         val newStatus = if (newPaidAmount >= invoice.totalAmount) "paid" else "partial"
         val updatedInvoice = invoice.copy(
@@ -60,7 +58,6 @@ class InvoiceRepository(
         )
         invoiceDao.update(updatedInvoice)
 
-        // 3. Update customer debt
         val customer = customerDao.getCustomerById(invoice.customerId).first()
         val updatedCustomer = customer.copy(
             totalDebt = customer.totalDebt - amount
