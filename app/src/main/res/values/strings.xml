@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">FocusEnterprise</string>
+    <string name="customers">Customers</string>
+    <string name="invoices">Invoices</string>
+    <string name="stock">Stock</string>
+    <string name="expenses">Expenses</string>
+    <string name="reports">Reports</string>
+</resources>
