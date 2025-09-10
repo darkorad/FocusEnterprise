@@ -1,0 +1,190 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.focusenterprise"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="34" />
+10
+11    <!-- Permissions for PDF export and printing -->
+12    <uses-permission
+12-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:6:5-7:38
+13        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+13-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:6:22-78
+14        android:maxSdkVersion="28" />
+14-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:7:9-35
+15    <uses-permission
+15-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:8:5-9:38
+16        android:name="android.permission.READ_EXTERNAL_STORAGE"
+16-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:8:22-77
+17        android:maxSdkVersion="32" />
+17-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:9:9-35
+18
+19    <!-- Modern storage permissions for Android 13+ -->
+20    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+20-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:12:5-76
+20-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:12:22-73
+21    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+21-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:13:5-75
+21-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:13:22-72
+22    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+22-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:14:5-75
+22-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:14:22-72
+23
+24    <!-- Manage external storage for comprehensive file access -->
+25    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+25-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:17:5-18:40
+25-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:17:22-79
+26
+27    <permission
+27-->[androidx.core:core:1.10.1] C:\Users\Darko\.gradle\caches\8.13\transforms\7cd3f3f40cd3f9728d3e9d6e5f197beb\transformed\core-1.10.1\AndroidManifest.xml:22:5-24:47
+28        android:name="com.focusenterprise.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+28-->[androidx.core:core:1.10.1] C:\Users\Darko\.gradle\caches\8.13\transforms\7cd3f3f40cd3f9728d3e9d6e5f197beb\transformed\core-1.10.1\AndroidManifest.xml:23:9-81
+29        android:protectionLevel="signature" />
+29-->[androidx.core:core:1.10.1] C:\Users\Darko\.gradle\caches\8.13\transforms\7cd3f3f40cd3f9728d3e9d6e5f197beb\transformed\core-1.10.1\AndroidManifest.xml:24:9-44
+30
+31    <uses-permission android:name="com.focusenterprise.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+31-->[androidx.core:core:1.10.1] C:\Users\Darko\.gradle\caches\8.13\transforms\7cd3f3f40cd3f9728d3e9d6e5f197beb\transformed\core-1.10.1\AndroidManifest.xml:26:5-97
+31-->[androidx.core:core:1.10.1] C:\Users\Darko\.gradle\caches\8.13\transforms\7cd3f3f40cd3f9728d3e9d6e5f197beb\transformed\core-1.10.1\AndroidManifest.xml:26:22-94
+32
+33    <application
+33-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:20:5-44:19
+34        android:name="com.focusenterprise.FocusEnterpriseApplication"
+34-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:21:9-51
+35        android:allowBackup="true"
+35-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:22:9-35
+36        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+36-->[androidx.core:core:1.10.1] C:\Users\Darko\.gradle\caches\8.13\transforms\7cd3f3f40cd3f9728d3e9d6e5f197beb\transformed\core-1.10.1\AndroidManifest.xml:28:18-86
+37        android:dataExtractionRules="@xml/data_extraction_rules"
+37-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:23:9-65
+38        android:debuggable="true"
+39        android:extractNativeLibs="false"
+40        android:fullBackupContent="@xml/backup_rules"
+40-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:24:9-54
+41        android:hardwareAccelerated="true"
+41-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:31:9-43
+42        android:icon="@mipmap/ic_launcher"
+42-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:25:9-43
+43        android:label="@string/app_name"
+43-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:26:9-41
+44        android:largeHeap="true"
+44-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:30:9-33
+45        android:roundIcon="@mipmap/ic_launcher_round"
+45-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:27:9-54
+46        android:supportsRtl="true"
+46-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:28:9-35
+47        android:theme="@style/Theme.FocusEnterprise" >
+47-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:29:9-53
+48        <activity
+48-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:33:9-43:20
+49            android:name="com.focusenterprise.MainActivity"
+49-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:34:13-41
+50            android:exported="true"
+50-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:35:13-36
+51            android:label="@string/app_name"
+51-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:36:13-45
+52            android:theme="@style/Theme.FocusEnterprise" >
+52-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:37:13-57
+53            <intent-filter>
+53-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:38:13-42:29
+54                <action android:name="android.intent.action.MAIN" />
+54-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:39:17-69
+54-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:39:25-66
+55
+56                <category android:name="android.intent.category.LAUNCHER" />
+56-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:41:17-77
+56-->C:\FocusEnterprise\app\src\main\AndroidManifest.xml:41:27-74
+57            </intent-filter>
+58        </activity>
+59        <activity
+59-->[androidx.compose.ui:ui-test-manifest:1.5.0] C:\Users\Darko\.gradle\caches\8.13\transforms\d52bf6e9d7202a695dc1090ae5f8248f\transformed\ui-test-manifest-1.5.0\AndroidManifest.xml:23:9-25:39
+60            android:name="androidx.activity.ComponentActivity"
+60-->[androidx.compose.ui:ui-test-manifest:1.5.0] C:\Users\Darko\.gradle\caches\8.13\transforms\d52bf6e9d7202a695dc1090ae5f8248f\transformed\ui-test-manifest-1.5.0\AndroidManifest.xml:24:13-63
+61            android:exported="true" />
+61-->[androidx.compose.ui:ui-test-manifest:1.5.0] C:\Users\Darko\.gradle\caches\8.13\transforms\d52bf6e9d7202a695dc1090ae5f8248f\transformed\ui-test-manifest-1.5.0\AndroidManifest.xml:25:13-36
+62        <activity
+62-->[androidx.compose.ui:ui-tooling-android:1.5.0] C:\Users\Darko\.gradle\caches\8.13\transforms\9c12a66427ac9fc12da137d9bd92b5d0\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
+63            android:name="androidx.compose.ui.tooling.PreviewActivity"
+63-->[androidx.compose.ui:ui-tooling-android:1.5.0] C:\Users\Darko\.gradle\caches\8.13\transforms\9c12a66427ac9fc12da137d9bd92b5d0\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+64            android:exported="true" />
+64-->[androidx.compose.ui:ui-tooling-android:1.5.0] C:\Users\Darko\.gradle\caches\8.13\transforms\9c12a66427ac9fc12da137d9bd92b5d0\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
+65
+66        <provider
+66-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Darko\.gradle\caches\8.13\transforms\0c76376115c866fd2448fa3e441e1ef0\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
+67            android:name="androidx.startup.InitializationProvider"
+67-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Darko\.gradle\caches\8.13\transforms\0c76376115c866fd2448fa3e441e1ef0\transformed\emoji2-1.4.0\AndroidManifest.xml:25:13-67
+68            android:authorities="com.focusenterprise.androidx-startup"
+68-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Darko\.gradle\caches\8.13\transforms\0c76376115c866fd2448fa3e441e1ef0\transformed\emoji2-1.4.0\AndroidManifest.xml:26:13-68
+69            android:exported="false" >
+69-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Darko\.gradle\caches\8.13\transforms\0c76376115c866fd2448fa3e441e1ef0\transformed\emoji2-1.4.0\AndroidManifest.xml:27:13-37
+70            <meta-data
+70-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Darko\.gradle\caches\8.13\transforms\0c76376115c866fd2448fa3e441e1ef0\transformed\emoji2-1.4.0\AndroidManifest.xml:29:13-31:52
+71                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+71-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Darko\.gradle\caches\8.13\transforms\0c76376115c866fd2448fa3e441e1ef0\transformed\emoji2-1.4.0\AndroidManifest.xml:30:17-75
+72                android:value="androidx.startup" />
+72-->[androidx.emoji2:emoji2:1.4.0] C:\Users\Darko\.gradle\caches\8.13\transforms\0c76376115c866fd2448fa3e441e1ef0\transformed\emoji2-1.4.0\AndroidManifest.xml:31:17-49
+73            <meta-data
+73-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\Darko\.gradle\caches\8.13\transforms\755c30e453a09c84ac7eacde0c9b3518\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
+74                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+74-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\Darko\.gradle\caches\8.13\transforms\755c30e453a09c84ac7eacde0c9b3518\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
+75                android:value="androidx.startup" />
+75-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\Darko\.gradle\caches\8.13\transforms\755c30e453a09c84ac7eacde0c9b3518\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
+76            <meta-data
+76-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+77                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+77-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+78                android:value="androidx.startup" />
+78-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+79        </provider>
+80
+81        <service
+81-->[androidx.room:room-runtime:2.5.2] C:\Users\Darko\.gradle\caches\8.13\transforms\96f10a5a04e0e04213e4f9d6616d48a7\transformed\room-runtime-2.5.2\AndroidManifest.xml:24:9-28:63
+82            android:name="androidx.room.MultiInstanceInvalidationService"
+82-->[androidx.room:room-runtime:2.5.2] C:\Users\Darko\.gradle\caches\8.13\transforms\96f10a5a04e0e04213e4f9d6616d48a7\transformed\room-runtime-2.5.2\AndroidManifest.xml:25:13-74
+83            android:directBootAware="true"
+83-->[androidx.room:room-runtime:2.5.2] C:\Users\Darko\.gradle\caches\8.13\transforms\96f10a5a04e0e04213e4f9d6616d48a7\transformed\room-runtime-2.5.2\AndroidManifest.xml:26:13-43
+84            android:exported="false" />
+84-->[androidx.room:room-runtime:2.5.2] C:\Users\Darko\.gradle\caches\8.13\transforms\96f10a5a04e0e04213e4f9d6616d48a7\transformed\room-runtime-2.5.2\AndroidManifest.xml:27:13-37
+85
+86        <receiver
+86-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+87            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+87-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+88            android:directBootAware="false"
+88-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+89            android:enabled="true"
+89-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+90            android:exported="true"
+90-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+91            android:permission="android.permission.DUMP" >
+91-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+92            <intent-filter>
+92-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+93                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+93-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+93-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+94            </intent-filter>
+95            <intent-filter>
+95-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+96                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+96-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+96-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+97            </intent-filter>
+98            <intent-filter>
+98-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+99                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+99-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+99-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+100            </intent-filter>
+101            <intent-filter>
+101-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+102                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+102-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+102-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Darko\.gradle\caches\8.13\transforms\b2d8e9efef39d77c58cfdbeebf38b577\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+103            </intent-filter>
+104        </receiver>
+105    </application>
+106
+107</manifest>

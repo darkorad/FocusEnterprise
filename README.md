@@ -1,0 +1,29 @@
+# Focus Enterprise
+
+Focus Enterprise is a 100% offline Android bookkeeping application built with Kotlin, Jetpack Compose, and Room. It is designed to help small businesses manage their invoices, customers, stock, payments, and expenses locally on their device.
+
+## Key Information
+
+*   **Offline First**: This application is designed to be fully functional without an internet connection. All data is stored in a local SQLite database on your device. No data is ever sent to a server.
+*   **Currency**: All financial values in the app are in **RSD (Serbian Dinar)**.
+
+## How to Build and Run
+
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/darkorad/FocusEnterprise.git
+    ```
+2.  Open the project in Android Studio.
+3.  Let Android Studio sync the Gradle files and download the necessary dependencies.
+4.  Build the project using `Build > Make Project`.
+5.  Run the app on an Android emulator or a physical device using `Run > Run 'app'`.
+
+## Features
+
+*   **Customers**: Manage your customer database.
+*   **Stock**: Keep track of your product inventory.
+*   **Invoices**: Create and manage invoices. Stock levels are automatically decremented.
+*   **Payments**: Record payments against invoices and track customer debt.
+*   **Expenses**: Log your monthly business expenses.
+*   **Reports**: View monthly reports summarizing your earnings, expenses, and net profit.
+*   **PDF Export**: Export individual invoices as PDF files.
