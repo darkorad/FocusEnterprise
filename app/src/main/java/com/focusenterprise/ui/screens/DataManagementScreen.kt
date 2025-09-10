@@ -66,6 +66,13 @@ fun DataManagementScreen(
     ) { uri: Uri? ->
         uri?.let { viewModel.importSalesDataFromExcel(context, it) }
     }
+
+    // File saver for error report
+    val errorReportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/plain")
+    ) { uri: Uri? ->
+        uri?.let { viewModel.saveErrorLog(context, it) }
+    }
     
     Column(
         modifier = Modifier
@@ -379,17 +386,17 @@ fun DataManagementScreen(
                         Text(if (isSalesImporting) "Importing Sales Data..." else "Select Sales Excel File")
                     }
                     
-                    // Sales Import Progress Bar
-                    if (isSalesImporting && salesImportProgress > 0) {
-                        Column {
-                            LinearProgressIndicator(
-                                progress = salesImportProgress / 100f,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                    // Sales Import Progress
+                    if (isSalesImporting) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Progress: $salesImportProgress%",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(top = 4.dp)
+                                text = if (salesImportProgress > 0) "Processing row: $salesImportProgress" else "Starting import...",
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
@@ -445,6 +452,50 @@ fun DataManagementScreen(
                         text = salesImportSummary,
                         style = MaterialTheme.typography.bodyMedium
                     )
+                }
+            }
+        }
+
+        // Sales Import Errors
+        val salesImportErrors by viewModel.salesImportErrors.collectAsState()
+        if (salesImportErrors.isNotEmpty()) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Import Errors",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                        Button(onClick = {
+                            val fileName = "sales_import_errors_${System.currentTimeMillis()}.txt"
+                            errorReportLauncher.launch(fileName)
+                        }) {
+                            Text("Download Report")
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    LazyColumn(modifier = Modifier.heightIn(max = 200.dp)) {
+                        items(salesImportErrors) { error ->
+                            Text(
+                                text = "Row ${error.rowNumber}: ${error.errorMessage}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
                 }
             }
         }

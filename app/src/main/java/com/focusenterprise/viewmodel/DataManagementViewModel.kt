@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.focusenterprise.data.repositories.*
 import com.focusenterprise.services.SalesDataService
+import com.focusenterprise.data.RowError
 import com.focusenterprise.data.SalesRecord
 import com.focusenterprise.utils.ExcelUtils
 import com.focusenterprise.utils.SalesImportResult
@@ -69,6 +70,9 @@ class DataManagementViewModel(
     
     private val _salesImportSummary = MutableStateFlow("")
     val salesImportSummary: StateFlow<String> = _salesImportSummary.asStateFlow()
+
+    private val _salesImportErrors = MutableStateFlow<List<RowError>>(emptyList())
+    val salesImportErrors: StateFlow<List<RowError>> = _salesImportErrors.asStateFlow()
 
     // Export all data to Excel with memory optimization
     fun exportDataToExcel(context: Context, uri: Uri) {
@@ -575,40 +579,41 @@ class DataManagementViewModel(
                 _isSalesImporting.value = true
                 _salesImportProgress.value = 0
                 _isError.value = false
+                _salesImportErrors.value = emptyList()
                 _statusMessage.value = "Reading sales data from Excel..."
-                
+
                 val importResult = withContext(Dispatchers.IO) {
                     context.contentResolver.openInputStream(uri)?.use { inputStream ->
                         ExcelUtils.importSalesDataFromStream(
                             inputStream = inputStream,
-                            onProgress = { processed, total ->
-                                val progress = if (total > 0) (processed * 100) / total else 0
-                                _salesImportProgress.value = progress
+                            onProgress = { processed, _ ->
+                                _salesImportProgress.value = processed
                             }
                         )
-                    } ?: SalesImportResult(emptyList(), 0, 0, listOf("Failed to read file"))
+                    } ?: SalesImportResult(emptyList(), 0, 0, listOf(RowError(0, "Failed to read file")))
                 }
-                
+
                 if (importResult.errors.isNotEmpty() && importResult.salesRecords.isEmpty()) {
-                    _statusMessage.value = "Import failed: ${importResult.errors.first()}"
-                    _salesImportSummary.value = "Errors: ${importResult.errors.joinToString(", ")}"
+                    _statusMessage.value = "Import failed: ${importResult.errors.first().errorMessage}"
+                    _salesImportSummary.value = "Import failed with ${importResult.errors.size} errors."
+                    _salesImportErrors.value = importResult.errors
                     _isError.value = true
                     return@launch
                 }
-                
+
                 _statusMessage.value = "Processing imported sales data..."
-                
+
                 // Convert sales records to database entities
                 val (invoices, invoiceItems, newCustomers) = withContext(Dispatchers.IO) {
                     salesDataService.convertToEntities(importResult.salesRecords)
                 }
-                
+
                 // Insert new customers first
                 var insertedCustomers = 0
                 var insertedInvoices = 0
                 var insertedItems = 0
                 var skippedRecords = 0
-                
+
                 withContext(Dispatchers.IO) {
                     // Insert new customers
                     newCustomers.forEach { customer ->
@@ -620,7 +625,7 @@ class DataManagementViewModel(
                             skippedRecords++
                         }
                     }
-                    
+
                     // Insert invoices with items
                     invoices.forEachIndexed { index, invoice ->
                         try {
@@ -634,19 +639,20 @@ class DataManagementViewModel(
                         }
                     }
                 }
-                
+
                 val totalProcessed = insertedCustomers + insertedInvoices + insertedItems
                 val totalSkipped = importResult.skippedCount + skippedRecords
-                
-                _statusMessage.value = "Sales data import completed! $totalProcessed records imported, $totalSkipped skipped."
+
+                _statusMessage.value = "Sales data import completed! ${importResult.importedCount} records imported, ${importResult.skippedCount} skipped."
                 _salesImportSummary.value = "Imported: ${importResult.importedCount} sales records\n" +
                                            "New Customers: $insertedCustomers\n" +
                                            "New Invoices: $insertedInvoices\n" +
                                            "Skipped: $totalSkipped\n" +
                                            if (importResult.errors.isNotEmpty()) "Errors: ${importResult.errors.size}" else ""
+                _salesImportErrors.value = importResult.errors
                 _salesImportProgress.value = 100
-                _isError.value = false
-                
+                _isError.value = importResult.errors.isNotEmpty()
+
             } catch (e: Exception) {
                 android.util.Log.e("DataManagementViewModel", "Sales import failed", e)
                 _statusMessage.value = "Import failed: ${e.message}"
@@ -671,6 +677,23 @@ class DataManagementViewModel(
         _salesImportSummary.value = ""
         _salesExportProgress.value = 0
         _salesImportProgress.value = 0
+        _salesImportErrors.value = emptyList()
+    }
+
+    fun saveErrorLog(context: Context, uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.bufferedWriter().use { writer ->
+                        _salesImportErrors.value.forEach { error ->
+                            writer.write("Row ${error.rowNumber}: ${error.errorMessage}\n")
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                // Handle exception
+            }
+        }
     }
 }
 
