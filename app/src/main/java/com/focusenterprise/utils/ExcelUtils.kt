@@ -8,8 +8,15 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.focusenterprise.data.*
 import org.apache.poi.ss.usermodel.*
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.openxml4j.opc.OPCPackage
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable
+import org.apache.poi.xssf.eventusermodel.XSSFReader
+import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler
+import org.apache.poi.xssf.model.StylesTable
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.xml.sax.InputSource
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -24,7 +31,7 @@ data class SalesImportResult(
     val salesRecords: List<SalesRecord>,
     val importedCount: Int,
     val skippedCount: Int,
-    val errors: List<String>
+    val errors: List<RowError>
 )
 
 class ExcelUtils {
@@ -67,93 +74,82 @@ class ExcelUtils {
         
         /**
          * Export sales data with proper column headers and progress tracking
-         * Crash-proof implementation for large datasets
+         * Crash-proof and memory-efficient implementation for large datasets using streaming.
          */
         fun exportSalesDataToStream(
             outputStream: OutputStream,
             salesRecords: List<SalesRecord>,
             onProgress: ((Int, Int) -> Unit)? = null
         ): Boolean {
+            // Use SXSSFWorkbook for streaming, which is memory-efficient for large datasets
+            val workbook = SXSSFWorkbook(100) // Keep 100 rows in memory, exceeding rows will be flushed to disk
             return try {
-                android.util.Log.d("ExcelUtils", "Exporting ${salesRecords.size} sales records")
-                
-                val workbook = XSSFWorkbook()
-                
-                try {
-                    // Create header style
-                    val headerStyle = workbook.createCellStyle()
-                    val headerFont = workbook.createFont()
-                    headerFont.bold = true
-                    headerStyle.setFont(headerFont)
-                    
-                    // Create sales data sheet
-                    val sheet = workbook.createSheet("Sales Data")
-                    
-                    // Create headers as specified in requirements
-                    val headerRow = sheet.createRow(0)
-                    val headers = arrayOf("Date", "CustomerName", "Product", "Quantity", "Price", "Total")
-                    headers.forEachIndexed { index, header ->
-                        val cell = headerRow.createCell(index)
-                        cell.setCellValue(header)
-                        cell.setCellStyle(headerStyle)
-                    }
-                    
-                    // Process data in chunks to prevent memory issues
-                    val chunkSize = 500
-                    var processedCount = 0
-                    
-                    salesRecords.chunked(chunkSize).forEachIndexed { chunkIndex, chunk ->
-                        chunk.forEachIndexed { recordIndex, record ->
-                            try {
-                                val rowIndex = processedCount + recordIndex + 1
-                                val row = sheet.createRow(rowIndex)
-                                
-                                // Validate and set data with null/invalid value handling
-                                row.createCell(0).setCellValue(record.getFormattedDate())
-                                row.createCell(1).setCellValue(record.customerName.takeIf { it.isNotBlank() } ?: "Unknown")
-                                row.createCell(2).setCellValue(record.product.takeIf { it.isNotBlank() } ?: "Unknown")
-                                row.createCell(3).setCellValue(if (record.quantity > 0) record.quantity.toDouble() else 0.0)
-                                row.createCell(4).setCellValue(if (record.price >= 0) record.price else 0.0)
-                                row.createCell(5).setCellValue(if (record.total >= 0) record.total else 0.0)
-                                
-                            } catch (e: Exception) {
-                                android.util.Log.w("ExcelUtils", "Error processing record at index ${processedCount + recordIndex}: ${e.message}")
-                                // Continue with next record instead of crashing
-                            }
-                        }
-                        
-                        processedCount += chunk.size
-                        
-                        // Report progress
-                        onProgress?.invoke(processedCount, salesRecords.size)
-                        
-                        // Force garbage collection between chunks for large datasets
-                        if (salesRecords.size > 5000 && chunkIndex % 10 == 0) {
-                            System.gc()
-                        }
-                    }
-                    
-                    // Auto-size columns
-                    for (i in 0..5) {
-                        try {
-                            sheet.autoSizeColumn(i)
-                        } catch (e: Exception) {
-                            // Continue if auto-sizing fails
-                            android.util.Log.w("ExcelUtils", "Failed to auto-size column $i: ${e.message}")
-                        }
-                    }
-                    
-                    // Write to output stream
-                    workbook.write(outputStream)
-                    outputStream.flush()
-                    
-                    android.util.Log.d("ExcelUtils", "Successfully exported $processedCount sales records")
-                    true
-                    
-                } finally {
-                    workbook.close()
+                android.util.Log.d("ExcelUtils", "Exporting ${salesRecords.size} sales records using streaming")
+
+                // Create header style
+                val headerStyle = workbook.createCellStyle()
+                val headerFont = workbook.createFont()
+                headerFont.bold = true
+                headerStyle.setFont(headerFont)
+
+                // Create sales data sheet
+                val sheet = workbook.createSheet("Sales Data")
+
+                // Create headers as specified in requirements
+                val headerRow = sheet.createRow(0)
+                val headers = arrayOf("Date", "CustomerName", "Product", "Quantity", "Price", "Total")
+                headers.forEachIndexed { index, header ->
+                    val cell = headerRow.createCell(index)
+                    cell.setCellValue(header)
+                    cell.setCellStyle(headerStyle)
                 }
-                
+
+                var processedCount = 0
+
+                salesRecords.forEachIndexed { index, record ->
+                    try {
+                        val rowIndex = index + 1
+                        val row = sheet.createRow(rowIndex)
+
+                        // Validate and set data with null/invalid value handling
+                        row.createCell(0).setCellValue(record.getFormattedDate())
+                        row.createCell(1).setCellValue(record.customerName.takeIf { it.isNotBlank() } ?: "Unknown")
+                        row.createCell(2).setCellValue(record.product.takeIf { it.isNotBlank() } ?: "Unknown")
+                        row.createCell(3).setCellValue(if (record.quantity > 0) record.quantity.toDouble() else 0.0)
+                        row.createCell(4).setCellValue(if (record.price >= 0) record.price else 0.0)
+                        row.createCell(5).setCellValue(if (record.total >= 0) record.total else 0.0)
+
+                        processedCount++
+
+                        // Report progress every 100 rows
+                        if (index > 0 && index % 100 == 0) {
+                            onProgress?.invoke(processedCount, salesRecords.size)
+                        }
+
+                    } catch (e: Exception) {
+                        android.util.Log.w("ExcelUtils", "Error processing record at index $index: ${e.message}")
+                        // Continue with next record instead of crashing
+                    }
+                }
+
+                onProgress?.invoke(processedCount, salesRecords.size) // Final progress update
+
+                // Auto-sizing columns is not supported in SXSSFWorkbook as it requires reading all rows.
+                // Set fixed column widths instead.
+                sheet.setColumnWidth(0, 20 * 256) // Date
+                sheet.setColumnWidth(1, 30 * 256) // CustomerName
+                sheet.setColumnWidth(2, 30 * 256) // Product
+                sheet.setColumnWidth(3, 15 * 256) // Quantity
+                sheet.setColumnWidth(4, 15 * 256) // Price
+                sheet.setColumnWidth(5, 15 * 256) // Total
+
+                // Write to output stream
+                workbook.write(outputStream)
+                outputStream.flush()
+
+                android.util.Log.d("ExcelUtils", "Successfully exported $processedCount sales records")
+                true
+
             } catch (e: OutOfMemoryError) {
                 android.util.Log.e("ExcelUtils", "Out of memory during sales export: ${e.message}", e)
                 System.gc()
@@ -161,6 +157,10 @@ class ExcelUtils {
             } catch (e: Exception) {
                 android.util.Log.e("ExcelUtils", "Failed to export sales data: ${e.message}", e)
                 false
+            } finally {
+                // SXSSFWorkbook creates temporary files that must be cleaned up
+                workbook.close()
+                workbook.dispose()
             }
         }
         
@@ -173,75 +173,108 @@ class ExcelUtils {
         }
         
         /**
-         * Import sales data from Excel with header validation
+         * Import sales data from an Excel file using a memory-efficient streaming parser (SAX).
+         * This approach is suitable for very large Excel files.
          */
         fun importSalesDataFromStream(
             inputStream: InputStream,
             onProgress: ((Int, Int) -> Unit)? = null
         ): SalesImportResult {
             return try {
-                val workbook = WorkbookFactory.create(inputStream)
-                val sheet = workbook.getSheetAt(0)
-                
-                val expectedHeaders = arrayOf("Date", "CustomerName", "Product", "Quantity", "Price", "Total")
-                val salesRecords = mutableListOf<SalesRecord>()
-                val errors = mutableListOf<String>()
-                
-                // Validate headers
-                val headerRow = sheet.getRow(0)
-                if (headerRow == null) {
-                    return SalesImportResult(emptyList(), 0, 1, listOf("No header row found"))
-                }
-                
-                val actualHeaders = (0 until headerRow.lastCellNum).map { 
-                    headerRow.getCell(it)?.stringCellValue?.trim() ?: ""
-                }
-                
-                if (!expectedHeaders.contentEquals(actualHeaders.toTypedArray())) {
-                    return SalesImportResult(
-                        emptyList(), 0, 1, 
-                        listOf("Header mismatch. Expected: ${expectedHeaders.joinToString()}, Found: ${actualHeaders.joinToString()}")
-                    )
-                }
-                
-                val totalRows = sheet.lastRowNum
-                var processedRows = 0
-                var skippedRows = 0
-                
-                // Process data rows
-                for (rowIndex in 1..totalRows) {
+                val pkg = OPCPackage.open(inputStream)
+                val sst = ReadOnlySharedStringsTable(pkg)
+                val xssfReader = XSSFReader(pkg)
+                val styles = xssfReader.stylesTable
+                val handler = SalesSheetHandler(onProgress)
+
+                val sheetParser = XSSFSheetXMLHandler(styles, null, sst, handler, DataFormatter(), false)
+
+                val sheet1 = xssfReader.sheetsData.next()
+                val source = InputSource(sheet1)
+                val parser = org.apache.poi.ooxml.util.SAXHelper.newXMLReader()
+                parser.contentHandler = sheetParser
+                parser.parse(source)
+                sheet1.close()
+                pkg.close()
+
+                handler.getResult()
+            } catch (e: Exception) {
+                android.util.Log.e("ExcelUtils", "Failed to import sales data using SAX: ${e.message}", e)
+                SalesImportResult(emptyList(), 0, 1, listOf(RowError(0, "Import failed: ${e.message}")))
+            }
+        }
+
+        /**
+         * Custom SAX event handler for processing Excel sheets row by row.
+         */
+        private class SalesSheetHandler(
+            private val onProgress: ((Int, Int) -> Unit)?
+        ) : XSSFSheetXMLHandler.SheetContentsHandler {
+
+            private val salesRecords = mutableListOf<SalesRecord>()
+            private val errors = mutableListOf<RowError>()
+            private var currentRow = -1
+            private var currentCol = -1
+            private var isHeader = true
+            private val expectedHeaders = arrayOf("Date", "CustomerName", "Product", "Quantity", "Price", "Total")
+            private val currentRowValues = mutableListOf<String>()
+
+            fun getResult(): SalesImportResult {
+                return SalesImportResult(salesRecords, salesRecords.size, errors.size, errors)
+            }
+
+            override fun startRow(rowNum: Int) {
+                currentRow = rowNum
+                currentCol = -1
+                currentRowValues.clear()
+            }
+
+            override fun endRow(rowNum: Int) {
+                if (currentRow == 0) { // Header row
+                    if (!expectedHeaders.contentEquals(currentRowValues.toTypedArray())) {
+                        errors.add(RowError(1, "Header mismatch. Expected: ${expectedHeaders.joinToString()}, Found: ${currentRowValues.joinToString()}"))
+                    }
+                } else if (currentRowValues.any { it.isNotBlank() }) { // Skip empty rows
                     try {
-                        val row = sheet.getRow(rowIndex)
-                        if (row == null) {
-                            skippedRows++
-                            continue
-                        }
-                        
-                        val salesRecord = SalesRecord.fromExcelRow(row)
-                        if (salesRecord.isValid()) {
-                            salesRecords.add(salesRecord)
-                            processedRows++
+                        val record = SalesRecord.fromExcelRow(
+                            date = currentRowValues.getOrElse(0) { "" },
+                            customerName = currentRowValues.getOrElse(1) { "" },
+                            product = currentRowValues.getOrElse(2) { "" },
+                            quantity = currentRowValues.getOrElse(3) { "" },
+                            price = currentRowValues.getOrElse(4) { "" },
+                            total = currentRowValues.getOrElse(5) { "" }
+                        )
+                        if (record != null && record.isValid()) {
+                            salesRecords.add(record)
                         } else {
-                            skippedRows++
-                            errors.add("Row ${rowIndex + 1}: Invalid data")
+                            errors.add(RowError(rowNum + 1, "Invalid or incomplete data in row."))
                         }
-                        
-                        // Report progress
-                        onProgress?.invoke(rowIndex, totalRows)
-                        
                     } catch (e: Exception) {
-                        skippedRows++
-                        errors.add("Row ${rowIndex + 1}: ${e.message}")
+                        errors.add(RowError(rowNum + 1, e.message ?: "Unknown error parsing row."))
                     }
                 }
-                
-                workbook.close()
-                
-                SalesImportResult(salesRecords, processedRows, skippedRows, errors)
-                
-            } catch (e: Exception) {
-                android.util.Log.e("ExcelUtils", "Failed to import sales data: ${e.message}", e)
-                SalesImportResult(emptyList(), 0, 1, listOf("Import failed: ${e.message}"))
+                onProgress?.invoke(rowNum, 0) // Cannot get total rows easily with SAX, so just report rows processed.
+            }
+
+            override fun cell(cellReference: String?, formattedValue: String?, comment: org.apache.poi.ss.usermodel.Comment?) {
+                val thisCol = if (cellReference != null) {
+                    val cr = org.apache.poi.ss.util.CellReference(cellReference)
+                    cr.col.toInt()
+                } else {
+                    currentCol + 1
+                }
+
+                // Fill in empty cells if needed
+                for (i in (currentCol + 1) until thisCol) {
+                    currentRowValues.add("")
+                }
+
+                currentCol = thisCol
+                currentRowValues.add(formattedValue ?: "")
+            }
+
+            override fun endSheet() {
+                // End of sheet
             }
         }
         

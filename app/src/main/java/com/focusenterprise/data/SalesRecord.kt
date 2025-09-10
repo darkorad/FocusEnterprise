@@ -128,13 +128,18 @@ data class SalesRecord(
 }
 
 /**
+ * Represents a detailed error for a specific row during import.
+ */
+data class RowError(val rowNumber: Int, val errorMessage: String)
+
+/**
  * Summary of sales import operation
  */
 data class SalesImportSummary(
     val totalRows: Int,
     val importedRows: Int,
     val skippedRows: Int,
-    val errors: List<String> = emptyList()
+    val errors: List<RowError> = emptyList()
 ) {
     val successRate: Double
         get() = if (totalRows > 0) (importedRows.toDouble() / totalRows) * 100 else 0.0
